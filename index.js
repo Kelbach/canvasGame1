@@ -15,20 +15,40 @@ const gravity = 0.5;
 const startPos = 300;
 
 class Sprite {
-    constructor({pos, vel}) {
+    constructor({pos, vel, color, offset}) {
         this.pos = pos;
         this.vel = vel;
+        this.width = 50;
         this.height = 150;
         this.lastKey;
+        this.attackBox = {
+            pos: {
+                x: this.pos.x,
+                y: this.pos.y
+            },
+            offset,
+            width: 100,
+            height: 50
+        }
+        this.color = color;
+        this.isAttacking;
     }
 
     draw() {
-        c.fillStyle = 'red';
+        c.fillStyle = this.color;
         c.fillRect(this.pos.x, this.pos.y, 50, this.height);
+
+        //attackbox
+        if (this.isAttacking) {
+            c.fillStyle = 'red'
+            c.fillRect(this.attackBox.pos.x, this.attackBox.pos.y, this.attackBox.width, this.attackBox.height);
+        }
     }
 
     update() {
         this.draw();
+        this.attackBox.pos.x = this.pos.x - this.attackBox.offset.x;
+        this.attackBox.pos.y = this.pos.y;
         
         this.pos.x += this.vel.x;
         this.pos.y += this.vel.y; //gravity sorta
@@ -38,6 +58,13 @@ class Sprite {
         } else {
             this.vel.y += gravity;
         }
+    }
+
+    attack() {
+        this.isAttacking = true;
+        setTimeout(()=>{
+            this.isAttacking = false;
+        }, 100)
     }
 }
 
@@ -50,6 +77,11 @@ const player = new Sprite(
         vel: {
             x: 0,
             y: 0,
+        },
+        color: 'green',
+        offset: {
+            x: 0,
+            y: 0
         }
     }
 )
@@ -64,6 +96,11 @@ const enemy = new Sprite(
         vel: {
             x: 0,
             y: 0,
+        },
+        color: 'orange',
+        offset: {
+            x: 50,
+            y: 0
         }
     }
 )
@@ -92,6 +129,16 @@ const keys = {
 
 //double presses caused movement left due to logic in animate
 let lastKey
+
+//hitbox detection function
+function rectCollision( {rect1, rect2} ) {
+    return (
+        rect1.attackBox.pos.x + rect1.attackBox.width >= rect2.pos.x &&
+        rect1.attackBox.pos.x <= rect2.pos.x + rect2.width &&
+        rect1.attackBox.pos.y + rect1.attackBox.height >= rect2.pos.y &&
+        rect1.attackBox.pos.y <= rect2.pos.y + rect2.height
+    )
+}
 
 function animate() {
     //this refreshes pos
@@ -122,6 +169,30 @@ function animate() {
         enemy.vel.x = -5;
     } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight') {
         enemy.vel.x = 5;
+    }
+
+    //player hit enemy detection
+    if (
+        rectCollision({
+            rect1: player,
+            rect2: enemy
+        }) 
+        && player.isAttacking
+        ) {
+        console.log('player hit enemy');
+        player.isAttacking = false;
+    }
+
+    //enemy hit player detection
+    if (
+        rectCollision({
+            rect1: enemy,
+            rect2: player
+        }) 
+        && enemy.isAttacking
+        ) {
+        console.log('enemy hit player');
+        enemy.isAttacking = false;
     }
 }
 
@@ -159,8 +230,13 @@ window.addEventListener('keydown', (event) => {
         case 'ArrowUp':
             enemy.vel.y = -15;
             break
+        case ' ':
+            player.attack();
+            break
+        case 'ArrowDown':
+            enemy.attack();
+            break
     }
-    console.log(event.key);
 })
 //stops movment
 window.addEventListener('keyup', (event) => {
