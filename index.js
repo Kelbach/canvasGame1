@@ -32,6 +32,7 @@ class Sprite {
         }
         this.color = color;
         this.isAttacking;
+        this.health = 100;
     }
 
     draw() {
@@ -47,6 +48,15 @@ class Sprite {
 
     update() {
         this.draw();
+
+        if (enemy.pos.x + enemy.width <= player.pos.x) {
+            player.attackBox.offset.x = 50;
+            enemy.attackBox.offset.x = 0;
+        } else {
+            player.attackBox.offset.x = 0;
+            enemy.attackBox.offset.x = 50;
+        }
+
         this.attackBox.pos.x = this.pos.x - this.attackBox.offset.x;
         this.attackBox.pos.y = this.pos.y;
         
@@ -181,6 +191,8 @@ function animate() {
         ) {
         console.log('player hit enemy');
         player.isAttacking = false;
+        enemy.health -= 20;
+        document.querySelector('#enemyHealth').style.width = enemy.health+'%';
     }
 
     //enemy hit player detection
@@ -193,6 +205,8 @@ function animate() {
         ) {
         console.log('enemy hit player');
         enemy.isAttacking = false;
+        player.health -= 20;
+        document.querySelector('#playerHealth').style.width = player.health+'%';
     }
 }
 
