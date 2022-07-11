@@ -41,8 +41,11 @@
                 background-color: red; 
                 width: 100px; 
                 height: 100px; 
-                flex-shrink: 0
-            ">
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            "> 90
             </div>
             <!-- enemyHealth -->
             <div style="position: relative; height: 30px; width: 100%">
@@ -52,6 +55,13 @@
                 </div>
             </div>
         </div>
+        <div id="result" style="
+            position:absolute; 
+            align-items: center; 
+            justify-content: center; 
+            top:0; right:0; bottom:0; left:0;
+            display: none;
+        ">Double KO</div>
         <canvas>
 
         </canvas>
