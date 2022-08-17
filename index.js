@@ -3,8 +3,8 @@ const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
 //set height/width to fixed amount
-canvas.width = 1024;
-canvas.height = 576;
+canvas.width = 1280;
+canvas.height = 720;
 
 //fillRect(x,y,width,height) ; set to be canvas size
 c.fillRect(0, 0, canvas.width, canvas.height);
@@ -14,71 +14,15 @@ c.fillRect(0, 0, canvas.width, canvas.height);
 const gravity = 0.5;
 const startPos = 300;
 
-class Sprite {
-    constructor({pos, vel, color, offset}) {
-        this.pos = pos;
-        this.vel = vel;
-        this.width = 50;
-        this.height = 150;
-        this.lastKey;
-        this.attackBox = {
-            pos: {
-                x: this.pos.x,
-                y: this.pos.y
-            },
-            offset,
-            width: 100,
-            height: 50
-        }
-        this.color = color;
-        this.isAttacking;
-        this.health = 100;
-    }
+const background = new Sprite({
+    pos: {
+        x: 0,
+        y: 0,
+    },
+    imgSrc: './assets/maxresdefault.jpg'
+})
 
-    draw() {
-        c.fillStyle = this.color;
-        c.fillRect(this.pos.x, this.pos.y, 50, this.height);
-
-        //attackbox
-        if (this.isAttacking) {
-            c.fillStyle = 'red'
-            c.fillRect(this.attackBox.pos.x, this.attackBox.pos.y, this.attackBox.width, this.attackBox.height);
-        }
-    }
-
-    update() {
-        this.draw();
-
-        if (enemy.pos.x + enemy.width <= player.pos.x) {
-            player.attackBox.offset.x = 50;
-            enemy.attackBox.offset.x = 0;
-        } else {
-            player.attackBox.offset.x = 0;
-            enemy.attackBox.offset.x = 50;
-        }
-
-        this.attackBox.pos.x = this.pos.x - this.attackBox.offset.x;
-        this.attackBox.pos.y = this.pos.y;
-        
-        this.pos.x += this.vel.x;
-        this.pos.y += this.vel.y; //gravity sorta
-
-        if (this.pos.y + this.height + this.vel.y >= canvas.height) {
-            this.vel.y = 0;
-        } else {
-            this.vel.y += gravity;
-        }
-    }
-
-    attack() {
-        this.isAttacking = true;
-        setTimeout(()=>{
-            this.isAttacking = false;
-        }, 100)
-    }
-}
-
-const player = new Sprite(
+const player = new Fighter(
     {
         pos: {
             x: startPos,
@@ -97,7 +41,7 @@ const player = new Sprite(
 )
 
 
-const enemy = new Sprite(
+const enemy = new Fighter(
     {
         pos: {
             x: canvas.width - startPos,
@@ -140,45 +84,6 @@ const keys = {
 //double presses caused movement left due to logic in animate
 let lastKey
 
-//hitbox detection function
-function rectCollision( {rect1, rect2} ) {
-    return (
-        rect1.attackBox.pos.x + rect1.attackBox.width >= rect2.pos.x &&
-        rect1.attackBox.pos.x <= rect2.pos.x + rect2.width &&
-        rect1.attackBox.pos.y + rect1.attackBox.height >= rect2.pos.y &&
-        rect1.attackBox.pos.y <= rect2.pos.y + rect2.height
-    )
-}
-
-function winner({player, enemy, timerId}) {
-    clearTimeout(timerId);
-    document.querySelector("#result").style.display = "flex"
-    if (player.health === enemy.health) {
-        document.querySelector("#result").innerHTML = "Double KO";
-    }
-    if (player.health > enemy.health) {
-        document.querySelector("#result").innerHTML = "Player Wins";
-    }
-    if (player.health < enemy.health) {
-        document.querySelector("#result").innerHTML = "Enemy Wins";
-    }
-}
-
-//time out wind conditions
-let timer = 90;
-let timerId;
-function decreaseTimer() {
-    if(timer>0) {
-        timerId = setTimeout(decreaseTimer, 1000)
-        timer--
-        document.querySelector("#timer").innerHTML = timer;
-    }
-
-    if (timer === 0){
-        winner({player, enemy, timerId});
-    }
-}
-
 decreaseTimer();
 
 function animate() {
@@ -187,6 +92,7 @@ function animate() {
     c.fillStyle = 'tan';
     c.fillRect(0, 0, canvas.width, canvas.height);
     //updates on every draw
+    background.update();
     player.update();
     enemy.update();
 
