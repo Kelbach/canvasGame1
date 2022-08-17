@@ -1,23 +1,49 @@
 class Sprite {
-    constructor({pos, imgSrc}) {
+    constructor({pos, imgSrc, scale=1, maxFrame = 1}) {
         this.pos = pos;
         this.width = 50;
         this.height = 150;
-        this.image = new Image()
-        this.image.src = imgSrc
+        this.image = new Image();
+        this.image.src = imgSrc;
+        this.scale = scale; //specify scale when rendering a creating new sprite
+        this.maxFrame = maxFrame;
+        this.currentFrame = 0;
+        this.framesElapsed = 0;
+        this.framesHold = 5; //higher number makes a slower framerate
     }
 
     draw() {
-        c.drawImage(this.image, this.pos.x, this.pos.y)
+        c.drawImage(
+            this.image, 
+            /*2:12:00 for cropping sprites from a single image
+            * crop x  - current Frame * (image.width / number of frames horiz)
+            * crop y  - current Frame * (image.height / number of frames vert)
+            * image.width / number of frames horiz
+            * image.height / number of frames vert
+            * REMEMBER to add these divisors to the width and height*scale below
+            */
+            this.pos.x, 
+            this.pos.y, 
+            this.image.width*this.scale, 
+            this.image.height*this.scale
+        )
     }
 
     update() {
         this.draw();
-
+        this.framesElapsed++
+        
+        if (this.framesElapsed % this.framesHold === 0) {
+            if (this.currentFrame < this.maxFrame){
+                this.currentFrame++
+            } else {
+                this.currentFrame = 0
+            }
+        }
     }
 }
 
-class Fighter {
+class Fighter extends Sprite {
     constructor({pos, vel, color, offset}) {
         this.pos = pos;
         this.vel = vel;
@@ -36,17 +62,6 @@ class Fighter {
         this.color = color;
         this.isAttacking;
         this.health = 100;
-    }
-
-    draw() {
-        c.fillStyle = this.color;
-        c.fillRect(this.pos.x, this.pos.y, 50, this.height);
-
-        //attackbox
-        if (this.isAttacking) {
-            c.fillStyle = 'red'
-            c.fillRect(this.attackBox.pos.x, this.attackBox.pos.y, this.attackBox.width, this.attackBox.height);
-        }
     }
 
     update() {
