@@ -36,7 +36,9 @@ const player = new Fighter(
         offset: {
             x: 0,
             y: 0
-        }
+        },
+        imgSrc: './assets/sol_complete_v2/00157.png', //START HERE FIGURE OUT HOW TO FLIP SPRITES AND ANIMATE
+        maxFrame: 5
     }
 )
 

@@ -15,7 +15,8 @@ class Sprite {
     draw() {
         c.drawImage(
             this.image, 
-            /*2:12:00 for cropping sprites from a single image
+            /*                                  2:12:00 for cropping sprites from a single image
+            *
             * crop x  - current Frame * (image.width / number of frames horiz)
             * crop y  - current Frame * (image.height / number of frames vert)
             * image.width / number of frames horiz
@@ -24,8 +25,8 @@ class Sprite {
             */
             this.pos.x, 
             this.pos.y, 
-            this.image.width*this.scale, 
-            this.image.height*this.scale
+            this.image.width*this.scale, // divided by maxFrame
+            this.image.height*this.scale // divided by maxFrame
         )
     }
 
@@ -44,24 +45,40 @@ class Sprite {
 }
 
 class Fighter extends Sprite {
-    constructor({pos, vel, color, offset}) {
-        this.pos = pos;
-        this.vel = vel;
-        this.width = 50;
-        this.height = 150;
-        this.lastKey;
-        this.attackBox = {
-            pos: {
-                x: this.pos.x,
-                y: this.pos.y
-            },
-            offset,
-            width: 100,
-            height: 50
-        }
-        this.color = color;
-        this.isAttacking;
-        this.health = 100;
+    constructor({
+        pos, 
+        vel, 
+        color, 
+        offset,
+        imgSrc, 
+        scale=1, 
+        maxFrame = 1
+        }) {
+            super({ //calls constructor of parent
+                pos,
+                imgSrc,
+                scale, 
+                maxFrame,
+            }); 
+            this.vel = vel;
+            this.width = 50;
+            this.height = 150;
+            this.lastKey;
+            this.attackBox = {
+                pos: {
+                    x: this.pos.x,
+                    y: this.pos.y
+                },
+                offset,
+                width: 100,
+                height: 50
+            }
+            this.color = color;
+            this.isAttacking;
+            this.health = 100;
+            this.currentFrame = 0;
+            this.framesElapsed = 0;
+            this.framesHold = 5;
     }
 
     update() {
